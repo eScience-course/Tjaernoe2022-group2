@@ -23,3 +23,4 @@ Introduction to CMIP6:
 Get data from pangeo and plot:
 /home/jovyan/escience-2022/tutorial/examples/notebooks/CMIP6_example.ipynb
 
+pre-industrial years: 1850-1900 (IPCC) 
