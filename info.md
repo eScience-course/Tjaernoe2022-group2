@@ -24,3 +24,5 @@ Get data from pangeo and plot:
 /home/jovyan/escience-2022/tutorial/examples/notebooks/CMIP6_example.ipynb
 
 pre-industrial years: 1850-1900 (IPCC) 
+
+What Amon/Emon etc means: https://clipc-services.ceda.ac.uk/dreq/index/miptable.html
