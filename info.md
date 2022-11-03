@@ -25,4 +25,7 @@ Get data from pangeo and plot:
 
 pre-industrial years: 1850-1900 (IPCC) 
 
+# About CMIP6 data
 What Amon/Emon etc means: https://clipc-services.ceda.ac.uk/dreq/index/miptable.html
+
+Check volcanic forcing: CMIP6.CMIP.NCAR.CESM2.historical.r11i1p1f1.AERmon.od550so4.gn
