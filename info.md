@@ -28,4 +28,16 @@ pre-industrial years: 1850-1900 (IPCC)
 # About CMIP6 data
 What Amon/Emon etc means: https://clipc-services.ceda.ac.uk/dreq/index/miptable.html
 
-Check volcanic forcing: CMIP6.CMIP.NCAR.CESM2.historical.r11i1p1f1.AERmon.od550so4.gn
+Check volcanic forcing: CMIP6.CMIP.NCAR.CESM2.historical.r11i1p1f1.AERmon.abs550aer.gn (CMIP6.CMIP.NCAR.CESM2.historical.r11i1p1f1.AERmon.od550so4.gn)
+
+# check system resource
+open a terminal cd to the start folder, use "df -h", it will show:
+Filesystem                                                                               Size  Used Avail Use% Mounted on
+overlay                                                                                   78G  8.3G   70G  11% /
+tmpfs                                                                                     64M     0   64M   0% /dev
+kubeserver.localdomain:/pv/daskhub-claim-zzhuo-pvc-34342ab8-fc08-4703-a2e3-282c3b95fa00  1.8T   13G  1.7T   1% /home/jovyan
+/dev/sda1                                                                                 78G  8.3G   70G  11% /etc/hosts
+shm                                                                                       64M  8.0K   64M   1% /dev/shm
+tmpfs                                                                                     32G     0   32G   0% /proc/acpi
+tmpfs                                                                                     32G     0   32G   0% /proc/scsi
+tmpfs                                                                                     32G     0   32G   0% /sys/firmware
