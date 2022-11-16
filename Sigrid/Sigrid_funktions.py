@@ -1,4 +1,4 @@
-def n_forcing_plot(data,data2):
+def forcing_plot(data,data2):
     #Before using this funktion the data and data2 has to be opened and one variable has to be selected.
     df = data.sel(time=slice(start_pina,end_pina))
     dg = data.sel(time=slice(start_krak,end_krak))
