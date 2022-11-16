@@ -1,3 +1,13 @@
+start_pina = cftime.DatetimeNoLeap(1985,1,15)
+end_prior_eruption_pina = cftime.DatetimeNoLeap(1991,1,15)
+end_pina = cftime.DatetimeNoLeap(1996,1,15)
+
+#Krakatao
+start_krak = cftime.DatetimeNoLeap(1878,1,15)
+end_prior_eruption_krak = cftime.DatetimeNoLeap(1882,1,15)
+end_krak = cftime.DatetimeNoLeap(1887,1,15)
+
+
 def forcing_plot(data,data2):
     #Before using this funktion the data and data2 has to be opened and one variable has to be selected.
     df = data.sel(time=slice(start_pina,end_pina))
