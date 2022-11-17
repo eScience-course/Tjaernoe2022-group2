@@ -212,17 +212,19 @@ def mean_plot_sing(data,vulcano):
     axs2.tick_params(labelsize=15) 
     axs3.tick_params(labelsize=15)
 
-    axs1.set_title(" Northern Hemisphere \n" , fontsize=20)
-    axs2.set_title(" Southern Hemisphere \n" , fontsize=20)
+    axs1.set_title(" North polar region >60N \n" , fontsize=20)
+    axs2.set_title(" South polar region >60S \n" , fontsize=20)
     axs3.set_title('Global Mean \n', fontsize=20)
 
 def north_multi_plot(data,yr,cs,title):
     proj_plot = ccrs.Orthographic(0, 90)
 
-    p = data.sel(time = data.time.dt.year.isin([yr])).squeeze().plot(x='lon',y='lat',transform=ccrs.PlateCarree(),levels=np.linspace(-1.5e-6,1.5e-6,31),subplot_kws={"projection": proj_plot}, col='time', col_wrap=6, robust=True, cmap=cs)
+    p = data.sel(time = data.time.dt.year.isin([yr])).squeeze().plot(x='lon',y='lat',levels=np.linspace(-1e-6,1e-6,31),transform=ccrs.PlateCarree(),subplot_kws={"projection": proj_plot}, col='time', col_wrap=6, robust=True, cmap=cs)
     # We have to set the map's options on all four axes
     for ax,i in zip(p.axes.flat,  data.time.sel(time = data.time.dt.year.isin([yr])).values):
         ax.coastlines()
         ax.set_title(i.strftime("%B %Y"), fontsize=18)
         
     ax.text(-2.1, 2.60, title, fontsize=25, transform=ax.transAxes, ha='center')
+    
+#levels=np.linspace(-1.5e-6,1.5e-6,31)
