@@ -228,3 +228,26 @@ def north_multi_plot(data,yr,cs,title):
     ax.text(-2.1, 2.60, title, fontsize=25, transform=ax.transAxes, ha='center')
     
 #levels=np.linspace(-1.5e-6,1.5e-6,31)
+
+def layers(data,data2):
+    #Plotting to find the layer where the SO4 aerosol has its max, and when
+    fig, (axs1,axs2) = plt.subplots(1, 2, constrained_layout=True, sharey=True, figsize=(20,10))
+
+    data.plot(ax=axs1,x='year')
+    data2.plot(ax=axs2,x='year')
+
+    fig.suptitle('Yearly mean SO4 consentration per layer >60N\n', fontsize=30)
+    
+    axs1.set_title(" Mt. Pinatubo \n" , fontsize=20)
+    axs2.set_title(" Krakatoa \n" , fontsize=20)
+
+    axs1.grid()
+    axs2.grid()
+
+    plt.gca().invert_yaxis()
+    axs1.set_xlabel('Year', fontsize=20)
+    axs1.set_ylabel('Pressure level', fontsize=20)
+    axs1.tick_params(labelsize=15) 
+    axs2.set_xlabel('Year', fontsize=20)
+    axs2.set_ylabel('', fontsize=20)
+    axs2.tick_params(labelsize=15)
