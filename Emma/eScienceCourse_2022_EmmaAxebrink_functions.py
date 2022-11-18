@@ -29,117 +29,150 @@ def calculate_total_ozone_p(ds):
     return ds3
 
 def computeWeightedMean(ds):
-    # Compute weights based on the xarray you pass
-    weights = np.cos(np.deg2rad(ds.lat))
-    weights.name = "weights"
-    # Compute weighted mean
-    air_weighted = ds.weighted(weights)
-    weighted_mean = air_weighted.mean(("lon", "lat"), keep_attrs=True)
-    return weighted_mean
+    ds2 = []
+    for i in ds.data_vars:
+        weights = np.cos(np.deg2rad(ds.lat))
+        weights.name = "weights"
+        # Compute weighted mean
+        air_weighted = ds[i].weighted(weights)
+        weighted_mean = air_weighted.mean(("lon", "lat"), keep_attrs=True)
+        ds2.append(weighted_mean)
+    ds3 = xr.merge(ds2)
+    return ds3
 
 def calc_yearly_anomaly(ds,end_prior_eruption):
-    start = ds.time[0].values
+    ds2 = []
     end_prior_eruption = cftime.DatetimeNoLeap(end_prior_eruption,1,15)
-    ds_post_eruption = ds.squeeze().groupby('time.year').mean('time', keep_attrs=True)
-    ds_climatology = ds.sel(time=slice(start,end_prior_eruption)).squeeze().groupby('time.year').mean('time', keep_attrs=True).mean('year', keep_attrs=True)
-    ds_anomaly = ds_post_eruption - ds_climatology
-    ds_anomaly.attrs = ds_climatology.attrs
-    return ds_anomaly
+    for i in ds.data_vars:
+        start = ds[i].time[0].values
+        ds_post_eruption = ds[i].squeeze().groupby('time.year').mean('time', keep_attrs=True)
+        ds_climatology=ds[i].sel(time=slice(start,end_prior_eruption)).squeeze(). \
+        groupby('time.year').mean('time',keep_attrs=True).mean('year',keep_attrs=True)
+        ds_anomaly = ds_post_eruption - ds_climatology
+        ds_anomaly.attrs = ds_climatology.attrs
+        ds2.append(ds_anomaly)
+    ds3 = xr.merge(ds2)
+    return ds3
 
 def calc_monthly_anomaly(ds,end_prior_eruption):
-    start = ds.time[0].values
+    ds2 = []
     end_prior_eruption = cftime.DatetimeNoLeap(end_prior_eruption,1,15)
-    ds_post_eruption = ds
-    ds_climatology = ds.sel(time=slice(start,end_prior_eruption)).groupby('time.month').mean('time', keep_attrs=True)
-    ds_anomaly = ds_post_eruption.groupby('time.month') - ds_climatology
-    ds_anomaly.attrs = ds_climatology.attrs
-    return ds_anomaly
+    for i in ds.data_vars:
+        start = ds[i].time[0].values
+        ds_post_eruption = ds[i]
+        ds_climatology = ds[i].sel(time=slice(start,end_prior_eruption)).groupby('time.month').mean('time', keep_attrs=True)
+        ds_anomaly = ds_post_eruption.groupby('time.month') - ds_climatology
+        ds_anomaly.attrs = ds_climatology.attrs
+        ds2.append(ds_anomaly)
+    ds3 = xr.merge(ds2)
+    return ds3
 
-def plot2_year(waccm1,waccm2, cam1, cam2, eruption_name):
-    fig, (axs1, axs2) = plt.subplots(1, 2, constrained_layout=True, sharey=True, figsize=(20,10))
-    #color = ['red','black','blue']
+def plot3_year(w1,w2,w3,c1,c2,c3,eruption_name):
+    fig, (axs1, axs2, axs3) = plt.subplots(1, 3, constrained_layout=True, sharey=True, figsize=(30,10))
     color = ['green','darkviolet','darkorange']
     
     for i in range(3):
         j = i+1
-        waccm1[i].plot(label="WACCM-"+ str(j), ax=axs1, linewidth=3, color=color[i])
-        waccm2[i].plot(label='WACCM-'+ str(j), ax=axs2, linewidth=3, color=color[i])
+        w1[i].plot(label='WACCM-'+ str(j), ax=axs1, linewidth=3, color=color[i])
+        w2[i].plot(label='WACCM-'+ str(j), ax=axs2, linewidth=3, color=color[i])
+        w3[i].plot(label='WACCM-'+ str(j), ax=axs3, linewidth=3, color=color[i])
+        
     
     for i in range(3):
         j = i+1
-        cam1[i].plot(label="CAM-"+ str(j), ax=axs1, linestyle='--', linewidth=3, color=color[i])
-        cam2[i].plot(label="CAM-"+ str(j), ax=axs2, linestyle='--', linewidth=3, color=color[i])
+        c1[i].plot(label='CAM-'+ str(j), ax=axs1, linestyle='--', linewidth=3, color=color[i])
+        c2[i].plot(label='CAM-'+ str(j), ax=axs2, linestyle='--', linewidth=3, color=color[i])
+        c3[i].plot(label="CAM-"+ str(j), ax=axs3, linestyle='--', linewidth=3, color=color[i])
     
-    fig.suptitle(eruption_name, fontsize=30)
+    axs1.axvline(w1.year[5], color='k',linestyle='--',dashes=(5, 10))
+    axs2.axvline(w1.year[5], color='k',linestyle='--',dashes=(5, 10))
+    axs3.axvline(w1.year[5], color='k',linestyle='--',dashes=(5, 10))
     
-    axs1.set_xticks(waccm1.year)
-    axs2.set_xticks(cam1.year)
+    fig.suptitle('    Yearly mean ' + eruption_name, fontsize=40)
     
-    axs1.axvline(waccm1.year[5], color='k',linestyle='--',dashes=(5, 10))
-    axs2.axvline(cam1.year[5], color='k',linestyle='--',dashes=(5, 10))
+    axs1.set_xticks(w1.year)
+    axs2.set_xticks(w1.year)
+    axs3.set_xticks(w1.year)
     
-    axs1.set_ylabel(waccm1[0].long_name + '\n(' + cam1[0].units +')', fontsize=20)
+    axs1.set_ylabel(w1[0].long_name + '\n(' + w1[0].units +')', fontsize=20)
     axs2.set_ylabel('', fontsize=20)
+    axs3.set_ylabel('', fontsize=20)
     
     axs1.set_xlabel('Year', fontsize=20)
     axs2.set_xlabel('Year', fontsize=20)
+    axs3.set_xlabel('Year', fontsize=20)
     
     axs1.tick_params(axis="x", labelsize=20)
     axs2.tick_params(axis="x", labelsize=20)
+    axs3.tick_params(axis="x", labelsize=20)
     
     axs1.tick_params(axis="y", labelsize=20)
     axs2.tick_params(axis="y", labelsize=20)
+    axs3.tick_params(axis="y", labelsize=20)
     
-    axs1.set_title(" Northern Hemisphere \n" , fontsize=25)
-    axs2.set_title(" Southern Hemisphere \n" , fontsize=25)
+    axs1.set_title(" Arctic (60N–90N) \n" , fontsize=25)
+    axs2.set_title("60S ~ 60N \n" , fontsize=25)
+    axs3.set_title(" Antarctic (60S–90S) \n" , fontsize=25)
     
-    plt.legend(fontsize=25)
-    return 
+    axs1.legend(fontsize=20)
+    return
 
-def plot2_month(waccm1,waccm2, cam1, cam2, eruption_name):
-    fig, (axs1, axs2) = plt.subplots(1, 2, constrained_layout=True, sharey=True, figsize=(20,10))
-    #color = ['red','black','blue']
+def plot3_month_mean(w1,w2,w3, c1, c2, c3, eruption_name,erup):
+    fig, (axs1, axs2, axs3) = plt.subplots(1, 3, constrained_layout=True, sharey=True, figsize=(30,10))
     color = ['green','darkviolet','darkorange']
     
-    for i in range(3):
-        j = i+1
-        waccm1[i].plot(label="WACCM-"+ str(j), ax=axs1, linewidth=3, color=color[i])
-        waccm2[i].plot(label='WACCM-'+ str(j), ax=axs2, linewidth=3, color=color[i])
-        
-    for i in range(3):
-        j = i+1
-        cam1[i].plot(label="CAM-"+ str(j), ax=axs1, linestyle='--', linewidth=3, color=color[i])
-        cam2[i].plot(label="CAM-"+ str(j), ax=axs2, linestyle='--', linewidth=3, color=color[i])
+    w1.plot(label="WACCM", ax=axs1, linewidth=3, color=color[1])
+    w2.plot(label='WACCM', ax=axs2, linewidth=3, color=color[1])
+    w3.plot(label='WACCM', ax=axs3, linewidth=3, color=color[1])
     
-    fig.suptitle(eruption_name, fontsize=30)
-    test_tid = []
-    for i in range(0,len(waccm1[0].time.values)):
-        if waccm1[0].time.values[i].month==6 :
-            test_tid.append(waccm1[0].time.values[i])
+    c1.plot(label="CAM", ax=axs1, linestyle='--', linewidth=3, color=color[2])
+    c2.plot(label="CAM", ax=axs2, linestyle='--', linewidth=3, color=color[2])
+    c2.plot(label="CAM", ax=axs3, linestyle='--', linewidth=3, color=color[2])
+
+    fig.suptitle('    Monthly mean ' + eruption_name, fontsize=30)
+    time_erupt = []
+    for i in range(0,len(w1.time.values)):
+        if len(w1.time.values) < 50:
+            if w1.time.values[i].month==2 or w1.time.values[i].month==6 or w1.time.values[i].month==10:
+                time_erupt.append(w1.time.values[i])
+        if len(w1.time.values) > 40:
+            if w1.time.values[i].month==6 :
+                time_erupt.append(w1.time.values[i])
             
-    axs1.set_xticks(test_tid)
-    axs2.set_xticks(test_tid)
+    axs1.set_xticks(time_erupt)
+    axs2.set_xticks(time_erupt)
+    axs3.set_xticks(time_erupt)
+    
     axs1.tick_params(axis='x', labelrotation = 45)
     axs2.tick_params(axis='x', labelrotation = 45)
+    axs3.tick_params(axis='x', labelrotation = 45)
     
-    axs1.axvline(waccm1.isel(time=[12*5]).time.values[0], color='k',linestyle='--',dashes=(5, 10))
-    axs2.axvline(cam1.isel(time=[12*5]).time.values[0], color='k',linestyle='--',dashes=(5, 10))
+    stop = cftime.DatetimeNoLeap(erup,6,15)
+    axs1.axvline(stop, color='k',linestyle='--',dashes=(5, 10))
+    axs2.axvline(stop, color='k',linestyle='--',dashes=(5, 10))
+    axs3.axvline(stop, color='k',linestyle='--',dashes=(5, 10))
     
-    axs1.set_ylabel(waccm1[0].long_name + '\n(' + cam1[0].units +')', fontsize=20)
+    axs1.set_ylabel(w1.long_name + '\n(' + w1.units +')', fontsize=20)
     axs2.set_ylabel('', fontsize=20)
+    axs3.set_ylabel('', fontsize=20)
     
-    axs1.set_xlabel('Year', fontsize=20)
-    axs2.set_xlabel('Year', fontsize=20)
+    axs1.set_xlabel('Time', fontsize=20)
+    axs2.set_xlabel('Time', fontsize=20)
+    axs3.set_xlabel('Time', fontsize=20)
     
     axs1.tick_params(axis="x", labelsize=20)
     axs2.tick_params(axis="x", labelsize=20)
+    axs3.tick_params(axis="x", labelsize=20)
     
     axs1.tick_params(axis="y", labelsize=20)
     axs2.tick_params(axis="y", labelsize=20)
+    axs3.tick_params(axis="y", labelsize=20)
     
-    axs1.set_title(" Northern Hemisphere \n" , fontsize=25)
-    axs2.set_title(" Southern Hemisphere \n" , fontsize=25)
+    axs1.set_title(" Arctic (60N–90N) \n" , fontsize=25)
+    axs2.set_title("60S ~ 60N \n" , fontsize=25)
+    axs3.set_title(" Antarctic (60S–90S) \n" , fontsize=25)
     
-    plt.legend(fontsize=25)
-    return 
+    axs1.legend(fontsize=20)
+    return
+
 
