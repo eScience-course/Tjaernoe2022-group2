@@ -34,8 +34,8 @@ def computeWeightedMean(ds):
         weights = np.cos(np.deg2rad(ds.lat))
         weights.name = "weights"
         # Compute weighted mean
-        air_weighted = ds[i].weighted(weights)
-        weighted_mean = air_weighted.mean(("lon", "lat"), keep_attrs=True)
+        weighted = ds[i].weighted(weights)
+        weighted_mean = weighted.mean(("lon", "lat"), keep_attrs=True)
         ds2.append(weighted_mean)
     ds3 = xr.merge(ds2)
     return ds3
@@ -117,7 +117,7 @@ def plot3_year(w1,w2,w3,c1,c2,c3,eruption_name):
     axs1.legend(fontsize=20)
     return
 
-def plot3_month_mean(w1,w2,w3, c1, c2, c3, eruption_name,erup):
+def plot3_month_mean(w1, w2, w3, c1, c2, c3, eruption_name,erup):
     fig, (axs1, axs2, axs3) = plt.subplots(1, 3, constrained_layout=True, sharey=True, figsize=(30,10))
     color = ['green','darkviolet','darkorange']
     
@@ -127,7 +127,7 @@ def plot3_month_mean(w1,w2,w3, c1, c2, c3, eruption_name,erup):
     
     c1.plot(label="CAM", ax=axs1, linestyle='--', linewidth=3, color=color[2])
     c2.plot(label="CAM", ax=axs2, linestyle='--', linewidth=3, color=color[2])
-    c2.plot(label="CAM", ax=axs3, linestyle='--', linewidth=3, color=color[2])
+    c3.plot(label="CAM", ax=axs3, linestyle='--', linewidth=3, color=color[2])
 
     fig.suptitle('    Monthly mean ' + eruption_name, fontsize=30)
     time_erupt = []
