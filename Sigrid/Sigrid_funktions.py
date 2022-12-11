@@ -236,7 +236,7 @@ def layers(data,data2):
     data.plot(ax=axs1,x='year')
     data2.plot(ax=axs2,x='year')
 
-    fig.suptitle('Yearly mean SO4 consentration per layer >60N\n', fontsize=30)
+    fig.suptitle('Yearly mean SO4 concentration per layer >60N\n', fontsize=30)
     
     axs1.set_title(" Mt. Pinatubo \n" , fontsize=20)
     axs2.set_title(" Krakatoa \n" , fontsize=20)
@@ -246,8 +246,22 @@ def layers(data,data2):
 
     plt.gca().invert_yaxis()
     axs1.set_xlabel('Year', fontsize=20)
-    axs1.set_ylabel('Pressure level', fontsize=20)
+    axs1.set_ylabel('Pressure level [hPa]', fontsize=20)
     axs1.tick_params(labelsize=15) 
     axs2.set_xlabel('Year', fontsize=20)
     axs2.set_ylabel('', fontsize=20)
     axs2.tick_params(labelsize=15)
+
+    
+def multi_plot(data,yr,cs):
+    proj_plot = ccrs.Robinson(central_longitude=0, globe=None)
+
+    p = data.sel(time = data.time.dt.year.isin([yr])).squeeze().plot(x='lon', y='lat',
+                                                                     transform=ccrs.PlateCarree(),
+                                                                     subplot_kws={"projection": proj_plot},
+                                                                     col='time', col_wrap=6, robust=True, cmap=cs)
+    # We have to set the map's options on all four axes
+    for ax,i in zip(p.axes.flat,  data.time.sel(time = data.time.dt.year.isin([yr])).values):
+        ax.coastlines()
+        ax.set_title(i.strftime("%B %Y"), fontsize=18)
+    
